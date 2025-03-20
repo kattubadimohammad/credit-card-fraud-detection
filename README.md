@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Credit Card Fraud Detection Project
 
 ## Project Overview
@@ -54,6 +53,12 @@ env\Scripts\activate # For Windows
 pip install -r requirements.txt
 ```
 
+## Dataset
+The dataset used for this project is available on Kaggle:
+[Credit Card Fraud Detection Dataset](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud)
+
+Download the dataset and place it in the `data/` directory as `creditcard.csv`.
+
 ## Usage
 1. **Data Preprocessing:**
 ```bash
@@ -89,7 +94,4 @@ This project is licensed under the MIT License.
 
 ## Contact
 For any questions or suggestions, please contact **miraclemohammad786@gmail.com**.
-=======
-# credit-card-fraud-detection
-A machine learning model to detect fraudulent credit card transactions
->>>>>>> 99718d49516cda74d902fab6c9fbf1ec98b47f27
+
