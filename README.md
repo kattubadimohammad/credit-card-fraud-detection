@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Credit Card Fraud Detection Project
 
 ## Project Overview
@@ -88,3 +89,7 @@ This project is licensed under the MIT License.
 
 ## Contact
 For any questions or suggestions, please contact **miraclemohammad786@gmail.com**.
+=======
+# credit-card-fraud-detection
+A machine learning model to detect fraudulent credit card transactions
+>>>>>>> 99718d49516cda74d902fab6c9fbf1ec98b47f27
