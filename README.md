@@ -8,7 +8,8 @@ This project aims to build a classification model to detect fraudulent credit ca
 Credit_Card_Fraud_Detection_Project/
 │
 ├── data/
-│   ├── creditcard.csv               # Dataset
+│   ├── creditcard.csv               # Dataset (Optional after compression)
+│   ├── creditcard.zip               # Compressed Dataset
 │
 ├── notebooks/
 │   ├── Credit_Card_Fraud_Detection.ipynb   # Jupyter Notebook with complete code
@@ -28,10 +29,11 @@ Credit_Card_Fraud_Detection_Project/
 │
 ├── utils/
 │   ├── logger.py                    # Logging setup for debugging
+│   ├── compress.py                  # Script to compress the CSV file
 │
 ├── requirements.txt                 # List of Python packages
 ├── README.md                        # Project documentation
-└── app.py                           # Optional: Streamlit app for visualization
+└── app.py                           # Optional: Streamlit app for visualization for visualization
 ```
 
 ## Installation
