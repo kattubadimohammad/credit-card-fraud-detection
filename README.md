@@ -1,40 +1,8 @@
 # Credit Card Fraud Detection Project
 
-## Project Overview
-This project aims to build a classification model to detect fraudulent credit card transactions. By analyzing transaction data, the model will predict whether a given transaction is fraudulent or not.
-
-## Project Structure
-```
-Credit_Card_Fraud_Detection_Project/
-│
-├── data/
-│   ├── creditcard.csv               # Dataset (Optional after compression)
-│   ├── creditcard.zip               # Compressed Dataset
-│
-├── notebooks/
-│   ├── Credit_Card_Fraud_Detection.ipynb   # Jupyter Notebook with complete code
-│
-├── src/
-│   ├── data_preprocessing.py        # Data cleaning and preprocessing
-│   ├── eda.py                       # Exploratory Data Analysis (EDA)
-│   ├── model_training.py            # Model training using Random Forest
-│   ├── evaluation.py                # Model evaluation
-│
-├── models/
-│   ├── random_forest_model.pkl      # Saved trained model using Pickle
-│
-├── reports/
-│   ├── eda_report.png               # Optional: Visualizations from EDA
-│   ├── model_performance.txt        # Evaluation results and metrics
-│
-├── utils/
-│   ├── logger.py                    # Logging setup for debugging
-│   ├── compress.py                  # Script to compress the CSV file
-│
-├── requirements.txt                 # List of Python packages
-├── README.md                        # Project documentation
-└── app.py                           # Optional: Streamlit app for visualization for visualization
-```
+## Deployment
+You can access the deployed application using the following link:
+[Credit Card Fraud Detection App](https://credit-card-fraud-detection-0bm5.onrender.com/)
 
 ## Installation
 1. Clone the repository:
@@ -59,7 +27,11 @@ pip install -r requirements.txt
 The dataset used for this project is available on Kaggle:
 [Credit Card Fraud Detection Dataset](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud)
 
-Download the dataset and place it in the `data/` directory as `creditcard.csv`.
+Download the dataset and place the zipped file in the `data/` directory as `creditcard.zip`.
+Run the following script to extract it:
+```bash
+python utils/compress.py
+```
 
 ## Usage
 1. **Data Preprocessing:**
@@ -89,7 +61,6 @@ streamlit run app.py
 
 ## Results
 - Evaluation metrics such as accuracy, precision, recall, and ROC-AUC score will be displayed.
-- Visualizations from the EDA process will be available under the `reports/` directory.
 
 ## License
 This project is licensed under the MIT License.
