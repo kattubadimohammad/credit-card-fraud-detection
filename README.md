@@ -1,70 +1,119 @@
-# Credit Card Fraud Detection Project
+# Credit Card Fraud Detection
 
-## Deployment
-You can access the deployed application using the following link:
+A machine-learning project that detects potentially fraudulent credit-card transactions using a Random Forest classifier and SMOTE for the imbalanced training data. A Streamlit interface is included for interactive predictions.
+
+## 🚀 Live Demo
+
 [Credit Card Fraud Detection App](https://credit-card-fraud-detection-0bm5.onrender.com/)
 
-## Installation
-1. Clone the repository:
-```bash
-git clone https://github.com/username/Credit_Card_Fraud_Detection.git
-cd Credit_Card_Fraud_Detection_Project
+## 📁 Project Structure
+
+```text
+credit-card-fraud-detection/
+├── app.py
+├── data/
+├── models/
+├── notebooks/
+├── reports/
+├── src/
+│   ├── data_processing.py
+│   ├── eda.py
+│   ├── evaluation.py
+│   └── model_training.py
+├── utils/
+├── requirements.txt
+└── README.md
 ```
 
-2. Create and activate a virtual environment:
+## 🛠️ Installation
+
 ```bash
-python -m venv env
-source env/bin/activate # For Linux/Mac
-env\Scripts\activate # For Windows
+git clone https://github.com/kattubadimohammad/credit-card-fraud-detection.git
+cd credit-card-fraud-detection
+
+python -m venv .venv
 ```
 
-3. Install the required packages:
+Activate the environment:
+
+```bash
+# Windows
+.venv\Scripts\activate
+
+# macOS/Linux
+source .venv/bin/activate
+```
+
+Install dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
 
-## Dataset
-The dataset used for this project is available on Kaggle:
-[Credit Card Fraud Detection Dataset](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud)
+## 📊 Dataset
 
-Download the dataset and place the zipped file in the `data/` directory as `creditcard.zip`.
-Run the following script to extract it:
-```bash
-python utils/compress.py
+This project uses the [Credit Card Fraud Detection dataset](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud) from Kaggle.
+
+The dataset contains anonymized PCA features (`V1`–`V28`), transaction `Amount`, `Time`, and the binary `Class` target.
+
+Place the extracted `creditcard.csv` file in:
+
+```text
+data/creditcard.csv
 ```
 
-## Usage
-1. **Data Preprocessing:**
-```bash
-python src/data_preprocessing.py
-```
+If using the repository's Git LFS dataset pointer, make sure Git LFS is installed and pull the tracked file before running the pipeline.
 
-2. **Exploratory Data Analysis:**
+## ▶️ Usage
+
+### 1. Exploratory Data Analysis
+
 ```bash
 python src/eda.py
 ```
 
-3. **Model Training:**
+### 2. Train the model
+
 ```bash
 python src/model_training.py
 ```
 
-4. **Evaluation:**
+Training performs a stratified train/test split and applies SMOTE only to the training set. The trained model is saved to `models/random_forest_model.pkl`.
+
+### 3. Evaluate the model
+
 ```bash
 python src/evaluation.py
 ```
 
-5. **Run the App (Optional):**
+Evaluation reports the confusion matrix, classification report, accuracy, ROC-AUC, and PR-AUC (Average Precision).
+
+### 4. Run the Streamlit app
+
 ```bash
 streamlit run app.py
 ```
 
-## Results
-- Evaluation metrics such as accuracy, precision, recall, and ROC-AUC score will be displayed.
+## ⚠️ Important: Retrain After the Pipeline Fix
 
-## License
+The preprocessing pipeline was updated so that `Amount` remains in its original units. This keeps training and Streamlit inference consistent and removes the previous preprocessing mismatch.
+
+**Retrain the model before relying on the deployed application:**
+
+```bash
+python src/model_training.py
+```
+
+Then redeploy/restart the Streamlit service so it uses the newly generated model artifact.
+
+## 🧠 Model Notes
+
+- **Algorithm:** Random Forest Classifier
+- **Imbalance handling:** SMOTE on training data only
+- **Features:** V1–V28 anonymized PCA components + Amount
+- **Target:** Class (`0` = legitimate, `1` = fraud)
+- **Evaluation:** Precision, recall, F1-score, ROC-AUC, PR-AUC, and confusion matrix
+
+## 📄 License
+
 This project is licensed under the MIT License.
-
-## Contact
-For any questions or suggestions, please contact **miraclemohammad786@gmail.com**.
-
