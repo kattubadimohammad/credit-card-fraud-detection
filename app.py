@@ -1,7 +1,6 @@
-import pickle
 from pathlib import Path
 
-import matplotlib.pyplot as plt
+import pickle
 import pandas as pd
 import streamlit as st
 
@@ -11,7 +10,13 @@ MODEL_PATH = PROJECT_ROOT / "models" / "random_forest_model.pkl"
 FEATURE_COLUMNS = [f"V{i}" for i in range(1, 29)] + ["Amount"]
 
 
-@st.cache_resource
+st.set_page_config(
+    page_title="Credit Card Fraud Detection",
+    page_icon="💳",
+    layout="centered",
+)
+
+
 def load_model():
     """Load the trusted trained model artifact."""
     try:
@@ -20,9 +25,14 @@ def load_model():
     except FileNotFoundError:
         st.error("⚠️ Model file not found. Please ensure the model exists in the models directory.")
         return None
-    except Exception as e:
-        st.error(f"⚠️ Unable to load the model: {e}")
+    except Exception as exc:
+        st.error(f"⚠️ Unable to load the model: {exc}")
         return None
+
+
+@st.cache_resource(show_spinner=False)
+def get_model():
+    return load_model()
 
 
 def predict(model, input_data):
@@ -32,129 +42,142 @@ def predict(model, input_data):
         prediction = model.predict(input_df)
         probability = model.predict_proba(input_df)
         return prediction, probability
-    except Exception as e:
-        st.error(f"⚠️ Error while predicting: {e}")
+    except Exception as exc:
+        st.error(f"⚠️ Error while predicting: {exc}")
         return None, None
 
 
-def plot_probability(probability):
-    """Display the model's class probabilities."""
-    labels = ["Legitimate", "Fraudulent"]
-    fig, ax = plt.subplots(figsize=(6, 4))
-    ax.bar(labels, probability[0])
-    ax.set_ylabel("Probability")
-    ax.set_ylim(0, 1)
-    ax.set_title("Prediction Confidence")
-    ax.yaxis.set_major_formatter(lambda value, _: f"{value:.0%}")
-    st.pyplot(fig)
-    plt.close(fig)
+def render_confidence_bars(legitimate_probability, fraud_probability):
+    """Render lightweight confidence bars without an external chart dependency."""
+    st.markdown(
+        "### 📊 Prediction Confidence"
+    )
+
+    st.write(f"**Legitimate:** {legitimate_probability:.2%}")
+    st.progress(float(legitimate_probability))
+
+    st.write(f"**Fraudulent:** {fraud_probability:.2%}")
+    st.progress(float(fraud_probability))
 
 
 def main():
-    st.set_page_config(page_title="Credit Card Fraud Detection", page_icon="💳", layout="centered")
-
-    st.title("🚀 Credit Card Fraud Detection")
-    st.write("Enter transaction details to predict whether the transaction is fraudulent.")
-
     st.markdown(
-        """
-        <style>
-            div.stButton > button {
-                padding: 10px 24px;
-                margin-top: 20px;
-            }
-            div.stNumberInput > label { color: #333; }
-        </style>
-        """,
+        "<h1 style='text-align:center;'>💳 Credit Card Fraud Detection</h1>",
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        "<p style='text-align:center;color:#666;'>Analyze a transaction using a trained Random Forest model.</p>",
         unsafe_allow_html=True,
     )
 
-    st.subheader("Transaction Features")
-    st.caption("V1–V28 are anonymized PCA components from the original credit-card dataset.")
+    st.info(
+        "ℹ️ V1–V28 are anonymized PCA components from the credit-card dataset. "
+        "For a meaningful prediction, enter a real or prepared feature vector from the same preprocessing pipeline."
+    )
+
+    st.subheader("🧾 Transaction Features")
 
     input_data = []
     valid_range = (-10.0, 10.0)
-
     cols = st.columns(2)
-    for i in range(1, 29):
-        with cols[(i - 1) % 2]:
+
+    for feature_number in range(1, 29):
+        column_index = (feature_number - 1) % 2
+        with cols[column_index]:
             value = st.number_input(
-                f"V{i}",
+                f"V{feature_number}",
                 value=0.0,
                 format="%.4f",
                 min_value=valid_range[0],
                 max_value=valid_range[1],
-                help=f"Anonymized Principal Component {i}",
+                help=f"Anonymized PCA component V{feature_number}",
             )
             input_data.append(value)
 
+    st.subheader("💸 Transaction Amount")
     amount = st.number_input(
-        "💸 Transaction Amount",
+        "Amount",
         value=0.0,
         format="%.2f",
         min_value=0.0,
-        help="Transaction amount in the original dataset units.",
+        help="Transaction amount in the same original units used by the trained model.",
     )
     input_data.append(amount)
 
-    input_data = [input_data]
+    st.divider()
 
     predict_col, reset_col = st.columns(2)
+
     with predict_col:
-        predict_clicked = st.button("🔎 Predict", use_container_width=True)
+        predict_clicked = st.button(
+            "🔎 Analyze Transaction",
+            use_container_width=True,
+            type="primary",
+        )
+
     with reset_col:
-        reset_clicked = st.button("🔄 Reset", use_container_width=True)
+        reset_clicked = st.button(
+            "🔄 Reset",
+            use_container_width=True,
+        )
 
     if reset_clicked:
         st.rerun()
 
     if predict_clicked:
-        model = load_model()
-        if model is not None:
-            with st.spinner("⏳ Predicting..."):
-                result, probability = predict(model, input_data)
+        model = get_model()
 
-            if result is not None and probability is not None:
-                fraud_probability = probability[0][1]
-                legitimate_probability = probability[0][0]
+        if model is None:
+            return
 
-                plot_probability(probability)
+        with st.spinner("Analyzing transaction..."):
+            result, probability = predict(model, [input_data])
 
-                if result[0] == 1:
-                    st.error(
-                        f"🚨 Fraudulent Transaction Detected! "
-                        f"Confidence: {fraud_probability:.2%}"
-                    )
-                else:
-                    st.success(
-                        f"✅ Transaction is Legitimate. "
-                        f"Confidence: {legitimate_probability:.2%}"
-                    )
+        if result is None or probability is None:
+            return
 
-                with st.expander("📊 View Detailed Prediction Data"):
-                    st.write(
-                        f"Legitimate: {legitimate_probability:.2%} | "
-                        f"Fraudulent: {fraud_probability:.2%}"
-                    )
-                    st.dataframe(
-                        pd.DataFrame(input_data, columns=FEATURE_COLUMNS),
-                        use_container_width=True,
-                    )
+        legitimate_probability = float(probability[0][0])
+        fraud_probability = float(probability[0][1])
+        is_fraud = int(result[0]) == 1
+        prediction_label = "Fraudulent" if is_fraud else "Legitimate"
+        confidence = fraud_probability if is_fraud else legitimate_probability
 
-                report_data = pd.DataFrame(
-                    {
-                        "Prediction": ["Fraudulent" if result[0] == 1 else "Legitimate"],
-                        "Legitimate_Probability": [legitimate_probability],
-                        "Fraudulent_Probability": [fraud_probability],
-                    }
-                )
-                csv_data = report_data.to_csv(index=False).encode("utf-8")
-                st.download_button(
-                    "📥 Download Report",
-                    csv_data,
-                    "fraud_detection_report.csv",
-                    "text/csv",
-                )
+        st.divider()
+        st.subheader("🎯 Transaction Result")
+
+        if is_fraud:
+            st.error(
+                f"🚨 Fraudulent Transaction Detected\n\n"
+                f"**Confidence: {confidence:.2%}**"
+            )
+        else:
+            st.success(
+                f"✅ Transaction is Legitimate\n\n"
+                f"**Confidence: {confidence:.2%}**"
+            )
+
+        render_confidence_bars(legitimate_probability, fraud_probability)
+
+        with st.expander("📋 View Transaction Details"):
+            details = pd.DataFrame([input_data], columns=FEATURE_COLUMNS)
+            st.dataframe(details, use_container_width=True)
+
+        report_data = pd.DataFrame(
+            {
+                "Prediction": [prediction_label],
+                "Confidence": [confidence],
+                "Legitimate_Probability": [legitimate_probability],
+                "Fraudulent_Probability": [fraud_probability],
+            }
+        )
+
+        st.download_button(
+            "📥 Download Prediction Report",
+            report_data.to_csv(index=False).encode("utf-8"),
+            "fraud_detection_report.csv",
+            "text/csv",
+            use_container_width=True,
+        )
 
 
 if __name__ == "__main__":
